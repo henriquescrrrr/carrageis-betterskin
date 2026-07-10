@@ -1,0 +1,31 @@
+# BetterSkin - Português (pt_PT)
+prefix: "&8[&bBetterSkin&8] &r"
+
+skin-link: "&aClica aqui para gerir a tua skin: &n%link%"
+skin-link-hover: "&7Clica para abrir o gestor de skins"
+
+skin-status: "&7A tua skin atual: &f%skin_name%"
+skin-status-none: "&7Não tens nenhuma skin personalizada."
+
+skin-applied: "&aSkin aplicada com sucesso!"
+skin-apply-failed: "&cFalha ao aplicar a skin. A usar versão em cache."
+skin-apply-no-skin: "&7Nenhuma skin encontrada. Usa &a/skin &7para configurar!"
+
+token-generated: "&aUm novo link foi gerado para ti."
+token-error: "&cFalha ao gerar o link. Tenta novamente mais tarde."
+
+reload-success: "&aConfiguração recarregada."
+reload-no-permission: "&cNão tens permissão para isso."
+
+cooldown: "&cPor favor espera antes de gerar um novo link."
+
+join-message: "&7Personaliza a tua skin! &aClica aqui &7para abrir o gestor de skins."
+
+status-header: "&8&m                    &r &bEstado da Skin &8&m                    "
+status-player: "&7Jogador: &f%player%"
+status-skin: "&7Skin: &f%skin_name%"
+status-model: "&7Modelo: &f%model%"
+status-source: "&7Origem: &f%source%"
+status-updated: "&7Última atualização: &f%date%"
+status-footer: "&8&m                                                        "
+

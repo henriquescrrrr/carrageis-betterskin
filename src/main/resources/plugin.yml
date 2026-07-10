@@ -1,0 +1,21 @@
+name: BetterSkin
+version: '${project.version}'
+main: pt.henrique.webskins.WebSkins
+api-version: '1.21'
+description: Browser-based skin management for offline-mode servers
+authors: [henrique]
+
+commands:
+  skin:
+    description: Manage your skin via browser
+    usage: /<command> [reload|status]
+    permission: betterskin.use
+
+permissions:
+  betterskin.use:
+    description: Allows using the /skin command
+    default: true
+  betterskin.admin:
+    description: Admin commands (reload, manage presets)
+    default: op
+

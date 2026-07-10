@@ -1,0 +1,31 @@
+# BetterSkin - English (en_US)
+prefix: "&8[&bBetterSkin&8] &r"
+
+skin-link: "&aClick here to manage your skin: &n%link%"
+skin-link-hover: "&7Click to open skin manager"
+
+skin-status: "&7Your current skin: &f%skin_name%"
+skin-status-none: "&7You have no custom skin set."
+
+skin-applied: "&aSkin applied successfully!"
+skin-apply-failed: "&cFailed to apply skin. Using cached version."
+skin-apply-no-skin: "&7No custom skin found. Use &a/skin &7to set one up!"
+
+token-generated: "&aA new link has been generated for you."
+token-error: "&cFailed to generate skin link. Please try again later."
+
+reload-success: "&aConfiguration reloaded."
+reload-no-permission: "&cYou don't have permission to do that."
+
+cooldown: "&cPlease wait before generating a new link."
+
+join-message: "&7Customize your skin! &aClick here &7to open the skin manager."
+
+status-header: "&8&m                    &r &bSkin Status &8&m                    "
+status-player: "&7Player: &f%player%"
+status-skin: "&7Skin: &f%skin_name%"
+status-model: "&7Model: &f%model%"
+status-source: "&7Source: &f%source%"
+status-updated: "&7Last updated: &f%date%"
+status-footer: "&8&m                                                        "
+

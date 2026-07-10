@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetterSkin · Skin Manager</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Navigation -->
+    <nav id="navbar" class="hidden">
+      <div class="nav-left">
+        <span class="logo">BetterSkin</span>
+        <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+        <a href="#" class="nav-link" data-page="editor">Editor</a>
+        <a href="#" class="nav-link" data-page="import">Import</a>
+        <a href="#" class="nav-link" data-page="presets">Presets</a>
+        <a href="#" class="nav-link" data-page="explore">Explore</a>
+      </div>
+      <div class="nav-right">
+        <button class="lang-btn" onclick="setLocale('en')">EN</button>
+        <button class="lang-btn" onclick="setLocale('pt-PT')">PT</button>
+        <span id="username-display" class="username"></span>
+      </div>
+    </nav>
+
+    <!-- Login Page -->
+    <div id="page-login" class="page">
+      <div class="login-card">
+        <h1>BetterSkin</h1>
+        <div id="login-status" class="info">Verifying your token...</div>
+        <div id="login-error" class="error hidden"></div>
+        <p class="desc">Get a new link by typing <code>/skin</code> in the Minecraft server.</p>
+      </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page hidden">
+      <div class="dashboard-layout">
+        <div class="preview-section">
+          <h2>Current Skin</h2>
+          <div id="skin-preview-container">
+            <canvas id="skin-preview-canvas" width="280" height="380"></canvas>
+          </div>
+          <div id="skin-info" class="skin-info hidden">
+            <span id="info-model"></span>
+            <span id="info-source"></span>
+          </div>
+          <p id="no-skin" class="muted">No custom skin set. Use the editor or import!</p>
+        </div>
+        <div class="actions-section">
+          <div class="quick-actions">
+            <button class="action-btn" data-page="import">Import</button>
+            <button class="action-btn" data-page="editor">Editor</button>
+            <button class="action-btn" data-page="presets">Presets</button>
+          </div>
+          <h3>Skin History</h3>
+          <div id="skin-history" class="history-list">
+            <p class="muted">No skins yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Page -->
+    <div id="page-editor" class="page hidden">
+      <h1>Skin Editor</h1>
+      <div class="editor-top-bar">
+        <div class="editor-model-select">
+          <label><input type="radio" name="editor-model" value="steve" checked> Steve (Classic)</label>
+          <label><input type="radio" name="editor-model" value="slim"> Alex (Slim)</label>
+        </div>
+        <div class="editor-import-btns">
+          <button class="outline-btn-sm" id="btn-load-steve">Load Steve</button>
+          <button class="outline-btn-sm" id="btn-load-file">Load PNG</button>
+          <button class="outline-btn-sm" id="btn-load-current">Load My Skin</button>
+          <input type="file" id="editor-file-input" accept=".png,image/png" style="display:none">
+        </div>
+      </div>
+      <div class="editor-layout">
+        <div class="toolbar">
+          <button class="tool-btn active" data-tool="pencil" title="Pencil"></button>
+          <button class="tool-btn" data-tool="eraser" title="Eraser"></button>
+          <button class="tool-btn" data-tool="fill" title="Fill"></button>
+          <button class="tool-btn" data-tool="picker" title="Pick Color"></button>
+          <hr>
+          <input type="color" id="color-picker" value="#ff0000" title="Color">
+          <div id="color-preview" class="color-preview"></div>
+          <hr>
+          <div class="palette" id="palette"></div>
+          <hr>
+          <button class="action-btn-sm" id="btn-undo" title="Undo"></button>
+          <button class="action-btn-sm" id="btn-redo" title="Redo"></button>
+          <button class="action-btn-sm" id="btn-clear" title="Clear all pixels"></button>
+          <hr>
+          <button class="action-btn-sm active" id="btn-toggle-guide" title="Toggle body-part guide overlay"></button>
+        </div>
+        <div class="canvas-area">
+          <canvas id="editor-display" width="512" height="512"></canvas>
+          <canvas id="editor-canvas" width="64" height="64" style="display:none"></canvas>
+          <div class="zoom-controls">
+            <button onclick="editorZoom(-1)">−</button>
+            <span id="zoom-label">8×</span>
+            <button onclick="editorZoom(1)">+</button>
+          </div>
+        </div>
+        <div class="editor-preview">
+          <h3>Preview</h3>
+          <canvas id="editor-preview-canvas" width="200" height="300"></canvas>
+        </div>
+      </div>
+      <div class="editor-footer">
+        <button class="save-btn" id="btn-save-skin" onclick="saveSkinFromEditor()">Save & Apply</button>
+      </div>
+      <div id="editor-status" class="hidden"></div>
+    </div>
+
+    <!-- Import Page -->
+    <div id="page-import" class="page hidden">
+      <h1>Import Skin</h1>
+      <div class="import-model-select">
+        <label><input type="radio" name="import-model" value="steve" checked> Steve (Classic)</label>
+        <label><input type="radio" name="import-model" value="slim"> Alex (Slim)</label>
+      </div>
+      <div class="import-tabs">
+        <button class="tab active" data-tab="username">From Username</button>
+        <button class="tab" data-tab="url">From URL</button>
+        <button class="tab" data-tab="file">Upload File</button>
+      </div>
+      <div id="tab-username" class="tab-content">
+        <div class="input-group">
+          <input type="text" id="import-username" placeholder="Enter Minecraft username...">
+          <button class="primary-btn" onclick="importFromUsername()">Search</button>
+        </div>
+      </div>
+      <div id="tab-url" class="tab-content hidden">
+        <div class="input-group">
+          <input type="text" id="import-url" placeholder="Paste skin image URL...">
+          <button class="primary-btn" onclick="importFromUrl()">Apply</button>
+        </div>
+      </div>
+      <div id="tab-file" class="tab-content hidden">
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
+          <input type="file" id="file-input" accept=".png,image/png" style="display:none" onchange="importFromFile(this)">
+          <p>Drag & drop a PNG file here, or click to browse</p>
+        </div>
+      </div>
+      <div id="import-status" class="hidden"></div>
+    </div>
+
+    <!-- Presets Page -->
+    <div id="page-presets" class="page hidden">
+      <h1>Skin Presets</h1>
+      <div class="preset-save-section">
+        <button class="outline-btn" id="btn-show-save-preset" onclick="toggleSavePreset()">Save Current Skin as Preset</button>
+        <div id="save-preset-form" class="hidden">
+          <input type="text" id="preset-name" placeholder="Preset name...">
+          <button class="primary-btn" onclick="savePreset()">Save</button>
+          <button class="secondary-btn" onclick="toggleSavePreset()">Cancel</button>
+        </div>
+      </div>
+      <h2>Server Presets</h2>
+      <div id="global-presets" class="preset-list"><p class="muted">No presets available.</p></div>
+      <h2>My Presets</h2>
+      <div id="personal-presets" class="preset-list"><p class="muted">No presets yet.</p></div>
+      <div id="preset-status" class="hidden"></div>
+    </div>
+
+    <!-- Explore Page -->
+    <div id="page-explore" class="page hidden">
+      <h1>Explore Skins</h1>
+      <p class="muted" style="margin-bottom:24px">Browse these popular websites to find amazing skins, then import them using the Import tab!</p>
+      <div class="explore-grid" id="explore-grid"></div>
+    </div>
+  </div>
+
+  <!--
+    skinview3d — 3D skin preview library.
+    Try multiple CDN sources for reliability.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.1.0/bundles/skinview3d.bundle.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/skinview3d@3.1.0/bundles/skinview3d.bundle.min.js'">
+  </script>
+  <script>
+    if (typeof skinview3d === 'undefined') {
+      console.warn('skinview3d failed to load from CDN. 3D previews disabled.');
+    } else {
+      console.log('skinview3d loaded:', Object.keys(skinview3d));
+    }
+  </script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
+

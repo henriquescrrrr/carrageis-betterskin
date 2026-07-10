@@ -1,0 +1,93 @@
+# ============================================================
+#  BetterSkin Configuration
+# ============================================================
+#  This plugin hosts its own website inside the Minecraft server.
+#  Players click a link in chat and manage their skin in the browser.
+#
+#  HOW IT WORKS:
+#  1. You start your Minecraft server with this plugin
+#  2. The plugin starts a small website on the port below
+#  3. Players get a clickable link in chat
+#  4. They open it in their browser and pick a skin
+#  5. The skin is applied when they rejoin (or instantly)
+# ============================================================
+
+# ---- Web Server Settings ----
+# This is the built-in website that runs inside your server.
+# You do NOT need to install anything extra.
+
+server:
+  # The port the website runs on.
+  # Pick any number that isn't already in use.
+  # DEFAULT: 4567
+  # TIP: Your Minecraft server uses 25565, so 4567 is fine.
+  port: 4567
+
+  # The public URL that players will see in their chat link.
+  # Change this to YOUR server's IP address or domain name.
+  #
+  # EXAMPLES:
+  #   - If your server IP is 123.45.67.89:
+  #     public-url: "http://123.45.67.89:4567"
+  #
+  #   - If you have a domain name:
+  #     public-url: "http://play.myserver.com:4567"
+  #
+  #   - If testing locally on your own PC:
+  #     public-url: "http://localhost:4567"
+  #
+  public-url: "http://localhost:4567"
+
+# ---- MineSkin API ----
+# MineSkin is a free service that "signs" your skin so Minecraft accepts it.
+# You NEED an API key for skins to work.
+#
+# Get your FREE key here: https://account.mineskin.org/keys
+# (Create an account, then generate an API key)
+#
+mineskin:
+  api-key: ""
+  api-url: "https://api.mineskin.org"
+
+# ---- Token Settings ----
+# When a player clicks /skin, they get a link with a secret token.
+# These settings control how that token works.
+
+token:
+  # How long the link is valid (in seconds). 300 = 5 minutes.
+  expiry-seconds: 300
+
+  # Extra security: only allow the link to work from the same IP
+  # the player is connecting from. Set to true if you want this.
+  bind-ip: false
+
+# ---- Join Behavior ----
+# What happens when a player joins the server.
+
+join:
+  # When to send the skin link in chat:
+  #   ALWAYS     = every time a player joins
+  #   FIRST_JOIN = only the very first time a player joins
+  #   NEVER      = never send automatically (players use /skin)
+  send-link-mode: "ALWAYS"
+
+  # Wait this many ticks before sending (20 ticks = 1 second).
+  # A small delay lets the player load in first.
+  link-delay-ticks: 40
+
+# ---- Skin Settings ----
+skin:
+  # How skins are applied:
+  #   INSTANT = skin updates immediately when changed in browser
+  #   ON_JOIN = skin updates next time the player joins
+  apply-mode: "INSTANT"
+
+  # How long to keep skins in memory (seconds).
+  # Higher = less database reads, but uses more RAM.
+  cache-ttl-seconds: 600
+
+# ---- Language ----
+# pt_PT = Português (default)
+# en_US = English
+locale: "pt_PT"
+
