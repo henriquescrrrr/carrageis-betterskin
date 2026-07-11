@@ -1,4 +1,4 @@
-# BetterSkin 🎮
+# BetterSkin
 
 **Browser-based skin management for offline-mode Minecraft servers.**
 
@@ -15,9 +15,9 @@ Drop the plugin JAR into your `plugins/` folder — that's it! No external softw
 5. The skin applies automatically (instantly or on next join)
 
 **Everything runs inside the plugin:**
-- 🗄️ SQLite database (stored in `plugins/BetterSkin/betterskin.db`)
-- 🌐 Built-in web server (serves the browser UI)
-- 🖊️ MineSkin API integration (for signing skins)
+SQLite database (stored in `plugins/BetterSkin/betterskin.db`)
+Built-in web server (serves the browser UI)
+MineSkin API integration (for signing skins)
 
 **This plugin is designed for `online-mode: false` servers.** Skins are signed via MineSkin and injected server-side — Mojang is not involved.
 
@@ -136,7 +136,7 @@ skin:
   apply-mode: "INSTANT"                         # INSTANT or ON_JOIN
   cache-ttl-seconds: 600                        # Memory cache duration
 
-locale: "en_US"                                 # en_US or pt_PT
+locale: "pt_PT"                                 # en_US | pt_PT (shipped default is pt_PT)
 ```
 
 ---
