@@ -154,7 +154,7 @@ public class ImportHandler {
         // Validate
         String error = ImageValidator.validate(imageBytes);
         if (error != null) {
-            WebServer.sendJson(exchange, 400, "{\"error\":\"" + error + "\"}");
+            WebServer.sendJsonError(exchange, 400, error);
             return;
         }
 
@@ -196,7 +196,7 @@ public class ImportHandler {
         String auth = exchange.getRequestHeaders().getFirst("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) return null;
         String token = auth.substring(7);
-        String[] result = plugin.getDatabase().verifyToken(token);
+        String[] result = plugin.getDatabase().verifyToken(token, WebServer.remoteIp(exchange));
         if (result == null) return null;
         return result[0];
     }

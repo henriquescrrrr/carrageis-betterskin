@@ -175,11 +175,16 @@ public class Database {
     }
 
     /**
-     * Verify a token. Returns [playerUuid, username] or null if invalid/expired.
+     * Verify a token. Returns [playerUuid, username] or null if invalid, expired, or
+     * presented from an address other than the one it was bound to.
+     *
+     * @param requestIp the address the HTTP request came from. Required: when
+     *                  {@code token.bind-ip} is enabled the token stores the player's
+     *                  game-session address and this method rejects any other caller.
      */
-    public synchronized String[] verifyToken(String token) throws SQLException {
+    public synchronized String[] verifyToken(String token, String requestIp) throws SQLException {
         String sql = """
-            SELECT t.player_uuid, p.username, t.expires_at, t.used_at
+            SELECT t.player_uuid, p.username, t.expires_at, t.used_at, t.ip_bind
             FROM auth_tokens t JOIN players p ON t.player_uuid = p.uuid
             WHERE t.token = ?
         """;
@@ -191,6 +196,13 @@ public class Database {
             long expiresAt = rs.getLong("expires_at");
             long now = System.currentTimeMillis() / 1000;
             if (now > expiresAt) return null;
+
+            // ip_bind is only written when token.bind-ip is on; a null means the token
+            // was minted with the option off and is valid from anywhere.
+            String boundIp = rs.getString("ip_bind");
+            if (boundIp != null && !boundIp.equals(requestIp)) {
+                return null;
+            }
 
             String playerUuid = rs.getString("player_uuid");
             String username = rs.getString("username");

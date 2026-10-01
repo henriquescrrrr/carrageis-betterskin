@@ -12,6 +12,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -26,6 +27,8 @@ public class WebServer {
     private final WebSkins plugin;
     private final Logger log;
     private HttpServer server;
+    /** Kept so stop() can shut it down: HttpServer never shuts down an executor it was given. */
+    private ExecutorService executor;
 
     /**
      * Hard cap on the size of a request body we will buffer into memory. A skin PNG is at
@@ -54,9 +57,11 @@ public class WebServer {
 
     public void start() {
         int port = plugin.getConfigManager().getServerPort();
+        String bindAddress = plugin.getConfigManager().getServerBindAddress();
         try {
-            server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
-            server.setExecutor(Executors.newFixedThreadPool(4));
+            server = HttpServer.create(new InetSocketAddress(bindAddress, port), 0);
+            executor = Executors.newFixedThreadPool(4);
+            server.setExecutor(executor);
 
             // API routes
             AuthHandler authHandler = new AuthHandler(plugin);
@@ -76,7 +81,7 @@ public class WebServer {
             server.start();
             log.info("========================================");
             log.info("  BetterSkin web server started!");
-            log.info("  Port: " + port);
+            log.info("  Bind: " + bindAddress + ":" + port);
             log.info("  URL:  " + plugin.getConfigManager().getPublicUrl());
             log.info("========================================");
         } catch (IOException e) {
@@ -89,6 +94,13 @@ public class WebServer {
     public void stop() {
         if (server != null) {
             server.stop(1);
+            server = null;
+        }
+        if (executor != null) {
+            // HttpServer.stop() closes the connections but leaves an externally supplied
+            // executor running, so its four threads survive every disable/enable cycle.
+            executor.shutdownNow();
+            executor = null;
             log.info("Web server stopped.");
         }
     }
@@ -161,6 +173,18 @@ public class WebServer {
 
     // ========== UTILITY METHODS (shared by handlers) ==========
 
+    /**
+     * Send a JSON error whose message is not a literal — image validation messages carry
+     * decoder text derived from the uploaded bytes, and concatenating that into a
+     * hand-built JSON string produces a malformed body as soon as it contains a quote or
+     * a backslash. Gson escapes it.
+     */
+    public static void sendJsonError(HttpExchange exchange, int status, String message) throws IOException {
+        com.google.gson.JsonObject obj = new com.google.gson.JsonObject();
+        obj.addProperty("error", message);
+        sendJson(exchange, status, obj.toString());
+    }
+
     public static void sendJson(HttpExchange exchange, int status, String json) throws IOException {
         byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -227,6 +251,22 @@ public class WebServer {
      */
     public static final class BodyTooLargeException extends IOException {
         public BodyTooLargeException() { super("Request body too large"); }
+    }
+
+    /**
+     * The address the request came from, for {@code token.bind-ip} checks.
+     * <p>
+     * Deliberately the real peer address and not {@code X-Forwarded-For}: the header is
+     * client-controlled unless a trusted proxy overwrites it, so honouring it would turn the
+     * binding into a check the attacker gets to answer. Behind a reverse proxy every request
+     * carries the proxy's address, which is why {@code token.bind-ip} defaults to off.
+     */
+    public static String remoteIp(HttpExchange exchange) {
+        InetSocketAddress remote = exchange.getRemoteAddress();
+        if (remote == null || remote.getAddress() == null) {
+            return null;
+        }
+        return remote.getAddress().getHostAddress();
     }
 
     /**

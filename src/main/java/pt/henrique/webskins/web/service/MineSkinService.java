@@ -30,16 +30,43 @@ public class MineSkinService {
     }
 
     /**
-     * Sign a skin from a URL. Returns [textureValue, textureSignature] or null on failure.
+     * The configured API key, or null if it is absent or unusable as a header value.
+     * <p>
+     * The check is not cosmetic. {@code HttpRequest.Builder.header} rejects a value
+     * containing a character illegal in an HTTP header, and on JDK 25 the
+     * {@code IllegalArgumentException} it throws quotes the offending value in full — so a
+     * key with a stray newline or non-ASCII character, the usual result of pasting into
+     * config.yml, would end up written to the server log by the catch blocks below. Reject
+     * it here and the raw key never reaches an exception message.
      */
-    public String[] signFromUrl(String imageUrl, String variant) {
+    private String usableApiKey() {
         String apiKey = plugin.getConfigManager().getMineskinApiKey();
-        String apiUrl = plugin.getConfigManager().getMineskinApiUrl();
-
         if (apiKey == null || apiKey.isBlank()) {
             log.warning("MineSkin API key not configured! Skins cannot be signed.");
             return null;
         }
+        for (int i = 0; i < apiKey.length(); i++) {
+            char c = apiKey.charAt(i);
+            if (c < 0x21 || c > 0x7E) {
+                log.warning("MineSkin API key in config.yml contains a character that is not "
+                        + "allowed in an HTTP header (position " + (i + 1) + "). Check for a "
+                        + "trailing newline, a space, or a smart quote from copy-paste. "
+                        + "Skins cannot be signed until it is fixed.");
+                return null;
+            }
+        }
+        return apiKey;
+    }
+
+    /**
+     * Sign a skin from a URL. Returns [textureValue, textureSignature] or null on failure.
+     */
+    public String[] signFromUrl(String imageUrl, String variant) {
+        String apiKey = usableApiKey();
+        if (apiKey == null) {
+            return null;
+        }
+        String apiUrl = plugin.getConfigManager().getMineskinApiUrl();
 
         try {
             JsonObject body = new JsonObject();
@@ -78,13 +105,11 @@ public class MineSkinService {
      * Sign a skin from base64 image data. Returns [textureValue, textureSignature] or null on failure.
      */
     public String[] signFromBase64(String base64ImageData, String variant) {
-        String apiKey = plugin.getConfigManager().getMineskinApiKey();
-        String apiUrl = plugin.getConfigManager().getMineskinApiUrl();
-
-        if (apiKey == null || apiKey.isBlank()) {
-            log.warning("MineSkin API key not configured! Skins cannot be signed.");
+        String apiKey = usableApiKey();
+        if (apiKey == null) {
             return null;
         }
+        String apiUrl = plugin.getConfigManager().getMineskinApiUrl();
 
         try {
             byte[] imageBytes = java.util.Base64.getDecoder().decode(base64ImageData);

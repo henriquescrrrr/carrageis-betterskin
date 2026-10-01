@@ -12,6 +12,7 @@ public class ConfigManager {
 
     // Server
     private int serverPort;
+    private String serverBindAddress;
     private String publicUrl;
 
     // MineSkin
@@ -44,6 +45,10 @@ public class ConfigManager {
         FileConfiguration cfg = plugin.getConfig();
 
         serverPort = cfg.getInt("server.port", 4567);
+        // Default keeps the pre-existing behaviour (all interfaces), because players reach
+        // this server from their own browsers. Operators who front it with a reverse proxy
+        // should set 127.0.0.1 so nothing but the proxy can reach the API.
+        serverBindAddress = cfg.getString("server.bind-address", "0.0.0.0");
         publicUrl = cfg.getString("server.public-url", "http://localhost:4567");
         // Remove trailing slash if present
         if (publicUrl.endsWith("/")) {
@@ -70,6 +75,7 @@ public class ConfigManager {
     }
 
     public int getServerPort()          { return serverPort; }
+    public String getServerBindAddress() { return serverBindAddress; }
     public String getPublicUrl()        { return publicUrl; }
     public String getMineskinApiKey()   { return mineskinApiKey; }
     public String getMineskinApiUrl()   { return mineskinApiUrl; }

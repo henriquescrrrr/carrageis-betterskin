@@ -62,7 +62,7 @@ public class AuthHandler {
         }
 
         try {
-            String[] result = plugin.getDatabase().verifyToken(token);
+            String[] result = plugin.getDatabase().verifyToken(token, WebServer.remoteIp(exchange));
             if (result == null) {
                 WebServer.sendJson(exchange, 401, "{\"error\":\"Invalid or expired token\"}");
                 return;

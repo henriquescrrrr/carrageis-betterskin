@@ -23,6 +23,13 @@ server:
   # TIP: Your Minecraft server uses 25565, so 4567 is fine.
   port: 4567
 
+  # Which network interface the website listens on.
+  #   0.0.0.0   = every interface, reachable from the internet. Needed when
+  #               players open the link directly, which is the normal setup.
+  #   127.0.0.1 = this machine only. Use it when you put nginx, Caddy or
+  #               Cloudflare in front, so the API is not exposed directly.
+  bind-address: "0.0.0.0"
+
   # The public URL that players will see in their chat link.
   # Change this to YOUR server's IP address or domain name.
   #
@@ -59,6 +66,9 @@ token:
 
   # Extra security: only allow the link to work from the same IP
   # the player is connecting from. Set to true if you want this.
+  # Leave off if the web server sits behind a reverse proxy or CDN: every
+  # request then arrives from the proxy's address, not the player's, and
+  # the check would reject the player's own browser.
   bind-ip: false
 
 # ---- Join Behavior ----
